@@ -119,6 +119,12 @@ class bot(znc.Module):
         self.commands = CommandList()
         self.commands.add('help', callback=self.help, usage='[command]')
         self.commands.add('which', r'^(?P<name>[\S]+)$', callback=self.which, usage='command')
+        self.commands.add('commands', callback=self.plugin_commands, description='Show all commands a plugin includes', usage='plugin', example='bot')
+
+    def find_plugin(self, name):
+        for plugin in self.plugins:
+            if plugin.__class__.__name__ == name:
+                return plugin
 
     def find_command(self, name):
         for plugin in self.plugins:
@@ -206,6 +212,16 @@ class bot(znc.Module):
                 if command.name == name:
                     return plugin.__class__.__name__
             return '{}: Plugin not found'.format(name)
+
+    def plugin_commands(self, event, line):
+        plugin = self.find_plugin(line)
+        if not plugin:
+            return '{}: Plugin not found'.format(line)
+
+        if not hasattr(plugin, 'commands') and len(plugin.commands) is 0:
+            return 'This plugin does not have any commands.'
+
+        return ', '.join([command.name for command in plugin.commands])
 
     # ZNC Module hooks
 
