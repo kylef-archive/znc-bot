@@ -9,7 +9,7 @@ class rand(bot.Module):
         self.commands.add('yesno', callback=self.yesno, description='Yes, or no?')
         self.commands.add('coinflip', callback=self.coinflip, description='Heads or tails?')
         self.commands.add('dice', callback=self.dice, description='Roll a dice')
-        self.commands.add('choice', callback=self.choice, description='Make a random choice', usage='<space seperated list>', example='sausage, bacon')
+        self.commands.add('choice', callback=self.choice, description='Make a random choice', usage='<comma seperated list>', example='sausage, bacon')
 
     def yesno(self, event, line):
         return self.choice(event, 'yes, no')
