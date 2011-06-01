@@ -10,6 +10,7 @@ class security(bot.Module):
         self.commands.add('hash', r'^((?P<algorithm>\S+) (?P<data>.+))?$', callback=self.hash, usage='[hash data]', example='sha256 hello world')
         self.commands.add('base64', callback=self.base64, usage='data', example='Encode the input with base64')
         self.commands.add('decode64', callback=self.decode64, usage='data', example='Decode the input with base64')
+        self.commands.add('rot13', callback=self.rot13, usage='data')
 
     def hash(self, event, algorithm=None, data=''):
         if not algorithm:
@@ -30,3 +31,7 @@ class security(bot.Module):
 
     def decode64(self, event, line):
         return str(base64.decodestring(bytes(line, 'utf8')), 'utf8')
+
+    def rot13(self, event, line):
+        rot13_trans = str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm')
+        return line.translate(rot13_trans)
