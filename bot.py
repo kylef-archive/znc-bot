@@ -7,6 +7,9 @@ class Module(znc.Module):
     def __init__(self):
         self.commands = CommandList()
 
+        if hasattr(self, 'register_commands'):
+            self.register_commands(self.commands.add)
+
     def find_bot(self):
         module = self.GetUser().GetModules().FindModule('bot')
         if module:

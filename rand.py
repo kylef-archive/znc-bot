@@ -4,12 +4,11 @@ import bot
 
 
 class rand(bot.Module):
-    def __init__(self):
-        super(rand, self).__init__()
-        self.commands.add('yesno', callback=self.yesno, description='Yes, or no?')
-        self.commands.add('coinflip', callback=self.coinflip, description='Heads or tails?')
-        self.commands.add('dice', callback=self.dice, description='Roll a dice')
-        self.commands.add('choice', callback=self.choice, description='Make a random choice', usage='<comma seperated list>', example='sausage, bacon')
+    def register_commands(self, add):
+        add('yesno', callback=self.yesno, description='Yes, or no?')
+        add('coinflip', callback=self.coinflip, description='Heads or tails?')
+        add('dice', callback=self.dice, description='Roll a dice')
+        add('choice', callback=self.choice, description='Make a random choice', usage='<comma seperated list>', example='sausage, bacon')
 
     def yesno(self, event, line):
         return self.choice(event, 'yes, no')
