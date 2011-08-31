@@ -1,3 +1,4 @@
+import re
 import znc
 
 from bot.commands import CommandList
