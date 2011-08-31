@@ -154,6 +154,6 @@ class bot(znc.Module):
         if message.startswith(self.nv['control_character']):
             self.handle_command(nick, channel, message[len(self.nv['control_character']):])
         else:
-            match = re.search(r'^{}(:|,) (.+)$'.format(self.GetUser().GetCurNick()), message)
+            match = re.search(r'^{}(:|,) (.+)$'.format(self.GetNetwork().GetCurNick()), message)
             if match:
                 self.handle_command(nick, channel, match.groups()[1])
