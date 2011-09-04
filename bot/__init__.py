@@ -59,9 +59,9 @@ class bot(znc.Module):
         return commands
 
     def handle_command(self, nick, channel=None, line=None):
-        event = Event(module=self, nick=nick, line=line)
+        event = Event(module=self, nick=str(nick), line=str(line))
         if channel:
-            event['channel'] = channel
+            event['channel'] = str(channel)
 
         line = line.replace('\|', "\0p\0")  # Escaped pipes
         result = None
