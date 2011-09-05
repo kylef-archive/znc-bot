@@ -4,7 +4,7 @@ from bot.commands import CommandList
 
 
 class Module(znc.Module):
-    module_types = [znc.UserModule, znc.NetworkModule]
+    module_types = [znc.CModInfo.UserModule, znc.CModInfo.NetworkModule]
 
     def __init__(self):
         self.commands = CommandList()
