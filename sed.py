@@ -1,7 +1,7 @@
 import re
 import bot
 
-SUBSTITUTE_REGEX = re.compile(r'^s/(?P<pattern>[{0}]*)/(?P<repl>[{0}]*)/?$'.format("\w\d\s\^\$\(\)\<\[\]\{\\\|\>\.\*\+\>\-_'"))
+SUBSTITUTE_REGEX = re.compile(r'^s/(?P<pattern>[{0}]*)/(?P<repl>[{0}]*)/?$'.format("\w\d\s\^\$\(\)\<\[\]\{\\\|\>\.\*\+\>\-_\!'"))
 
 class sed(bot.Module):
     def __init__(self):
