@@ -62,6 +62,7 @@ class bot(znc.Module):
         event = Event(module=self, nick=str(nick), line=str(line))
         if channel:
             event['channel'] = str(channel)
+            event['_channel'] = channel
 
         line = line.replace('\|', "\0p\0")  # Escaped pipes
         result = None
@@ -126,7 +127,8 @@ class bot(znc.Module):
             for command in plugin.commands:
                 if command.name == name:
                     return plugin.__class__.__name__
-            return '{}: Plugin not found'.format(name)
+
+        return '{}: Command not found'.format(name)
 
     def plugin_commands(self, event, line):
         plugin = self.find_plugin(line)
