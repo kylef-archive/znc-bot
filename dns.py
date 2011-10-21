@@ -2,9 +2,8 @@ import socket
 import bot
 
 class dns(bot.Module):
-    def __init__(self):
-        super(dns, self).__init__()
-        self.commands.add('dns', callback=self.dns, usage='fqdn or ip', example='github.com')
+    def register_commands(self, add)
+        add('dns', callback=self.dns, usage='fqdn or ip', example='github.com')
 
     def dns(self, event, line):
         result = socket.gethostbyaddr(line)
