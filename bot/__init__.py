@@ -159,7 +159,7 @@ class bot(znc.Module):
 
         if message.startswith(self.nv['control_character']):
             line = message[len(self.nv['control_character']):]
-            if line and not re.match('^[A-z]', line):
+            if line and re.match('^[A-z]', line):
                 self.handle_command(nick, channel, line)
         else:
             match = re.search(r'^{}(:|,) (.+)$'.format(self.GetNetwork().GetCurNick()), message)
