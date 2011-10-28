@@ -71,7 +71,7 @@ class bot(znc.Module):
             command = command.strip()
             command = command.replace("\0p\0", '|')  # Unescaped pipes
 
-            if not re.match('^[A-z]', command):
+            if not re.match('^[A-z0-9]', command):
                 event.reply("Commands must start with a character.")
                 return
 
@@ -159,7 +159,7 @@ class bot(znc.Module):
 
         if message.startswith(self.nv['control_character']):
             line = message[len(self.nv['control_character']):]
-            if line and re.match('^[A-z]', line):
+            if line and re.match('^[A-z0-9]', line):
                 self.handle_command(nick, channel, line)
         else:
             match = re.search(r'^{}(:|,) (.+)$'.format(self.GetNetwork().GetCurNick()), message)
