@@ -1,16 +1,8 @@
 import znc
 
-from bot.commands import CommandList
-
 
 class Module(znc.Module):
     module_types = [znc.CModInfo.UserModule, znc.CModInfo.NetworkModule]
-
-    def __init__(self):
-        self.commands = CommandList()
-
-        if hasattr(self, 'register_commands'):
-            self.register_commands(self.commands.add)
 
     def find_bot(self):
         module = None
