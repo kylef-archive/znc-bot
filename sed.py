@@ -5,11 +5,7 @@ SUBSTITUTE_REGEX = re.compile(r'^s/(?P<pattern>[{0}]*)/(?P<repl>[{0}]*)/?$'.form
 
 class sed(bot.Module):
     def __init__(self):
-        super(sed, self).__init__()
         self.previous_lines = {}
-
-    def register_commands(self, add):
-        add('sed', callback=self.sed)
 
     def OnChanMsg(self, nick, chan, message):
         match = SUBSTITUTE_REGEX.match(str(message))
@@ -19,6 +15,7 @@ class sed(bot.Module):
         else:
             self.previous_lines[str(nick)] = str(message)
 
+    @bot.command()
     def sed(self, event, line):
         sed, line = line.split(' ', 1)
         self.substitute(event, string=line, **SUBSTITUTE_REGEX.match(sed).groupdict())
