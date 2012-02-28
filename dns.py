@@ -2,7 +2,7 @@ import socket
 import bot
 
 class dns(bot.Module):
-    def register_commands(self, add)
+    def register_commands(self, add):
         add('dns', callback=self.dns, usage='fqdn or ip', example='github.com')
 
     def dns(self, event, line):
