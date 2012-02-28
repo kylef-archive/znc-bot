@@ -13,32 +13,18 @@ class Module(znc.Module):
             self.register_commands(self.commands.add)
 
     def find_bot(self):
-        module = self.GetUser().GetModules().FindModule('bot')
+        module = None
+
+        if self.GetNetwork():
+            module = self.GetNetwork().GetModules.FindModule('bot')
+
+        if not module:
+            module = self.GetUser().GetModules().FindModule('bot')
+
         if module:
             return znc.AsPyModule(module).GetNewPyObj()
+
         return None
-
-    # ZNC Module hooks
-
-    def OnLoad(self, args, ret):
-        bot = self.find_bot()
-
-        if not bot:
-            ret.s = 'bot: cannot find module'
-            return False
-
-        bot.plugins.append(self)
-        return True
-
-    def OnShutdown(self):
-        bot = self.find_bot()
-
-        if bot:
-            try:
-                bot.plugins.remove(self)
-            except ValueError:
-                # We wasn't loaded
-                pass
 
 
 class Event(dict):

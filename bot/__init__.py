@@ -30,19 +30,19 @@ class bot(znc.Module):
     description = 'Python Bot'
 
     def __init__(self):
-        self.plugins = [self, Ping(), Utils()]
+        self.extra_plugins = [self, Ping(), Utils()]
         self.commands = CommandList()
         self.commands.add('help', callback=self.help, usage='[command]')
         self.commands.add('which', r'^(?P<name>[\S]+)$', callback=self.which, usage='command')
         self.commands.add('commands', callback=self.plugin_commands, description='Show all commands a plugin includes', usage='plugin', example='bot')
 
     def find_plugin(self, name):
-        for plugin in self.plugins:
+        for plugin in self.plugins():
             if plugin.__class__.__name__ == name:
                 return plugin
 
     def find_command(self, name):
-        for plugin in self.plugins:
+        for plugin in self.plugins():
             if hasattr(plugin, 'commands'):
                 command = plugin.commands.find(name)
                 if command:
@@ -52,11 +52,26 @@ class bot(znc.Module):
     def all_commands(self):
         commands = []
 
-        for plugin in self.plugins:
+        for plugin in self.plugins():
             if hasattr(plugin, 'commands'):
                 commands += plugin.commands
 
         return commands
+
+    def plugins(self):
+        if self.GetNetwork():
+            for module in self.GetNetwork().GetModules():
+                py_module = module = znc.AsPyModule(module)
+                if py_module:
+                    yield py_module.GetNewPyObj()
+
+        for module in self.GetUser().GetModules():
+            py_module = module = znc.AsPyModule(module)
+            if py_module:
+                yield py_module.GetNewPyObj()
+
+        for plugin in self.extra_plugins:
+            yield plugin
 
     def handle_command(self, nick, channel=None, line=None):
         event = Event(module=self, nick=str(nick), line=str(line))
@@ -124,7 +139,7 @@ class bot(znc.Module):
         return ', '.join([command.name for command in self.all_commands()])
 
     def which(self, event, name):
-        for plugin in self.plugins:
+        for plugin in self.plugins():
             if not hasattr(plugin, 'commands'):
                 continue
 
