@@ -1,9 +1,9 @@
 import re
-import bot
+from bot.api import *
 
 SUBSTITUTE_REGEX = re.compile(r'^s/(?P<pattern>[{0}]*)/(?P<repl>[{0}]*)/?$'.format("\w\d\s\^\$\(\)\<\[\]\{\\\|\>\.\*\+\>\-_\!'"))
 
-class sed(bot.Module):
+class sed(Module):
     def __init__(self):
         self.previous_lines = {}
 
@@ -15,7 +15,7 @@ class sed(bot.Module):
         else:
             self.previous_lines[str(nick)] = str(message)
 
-    @bot.command()
+    @command()
     def sed(self, event, line):
         sed, line = line.split(' ', 1)
         self.substitute(event, string=line, **SUBSTITUTE_REGEX.match(sed).groupdict())
