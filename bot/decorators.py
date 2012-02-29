@@ -1,5 +1,6 @@
 import re
 from functools import wraps
+from bot.http import HttpSock
 
 def regex(pattern=r'^(?P<line>.+)?$'):
     def decorator(func):
@@ -37,6 +38,29 @@ def command(**kwargs):
 
 def is_command(func):
     return getattr(func, 'is_command', False)
+
+def http(func):
+    @wraps(func)
+    def new_func(plugin, event, *args, **kwargs):
+        def request(*rargs, **rkwargs):
+            plugin.CreateSocket(HttpSock, event, new_func, *rargs, **rkwargs)
+
+        event.http = request
+        return func(plugin, event, *args, **kwargs)
+
+    new_func.http_handlers = {}
+
+    def http_handler_decorator(status=None):
+        def handler(func):
+            new_func.http_handlers[status] = func
+            return func
+
+        return handler
+
+    new_func.http = http_handler_decorator
+
+    return new_func
+
 
 # IRC
 def private(func):

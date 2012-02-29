@@ -1,8 +1,8 @@
 import znc
-
+from bot.http import *
 
 class Module(znc.Module):
-    module_types = [znc.CModInfo.UserModule, znc.CModInfo.NetworkModule]
+    module_types = [znc.CModInfo.NetworkModule, znc.CModInfo.UserModule]
 
     def find_bot(self):
         module = None

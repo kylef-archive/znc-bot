@@ -2,12 +2,12 @@ from io import StringIO
 
 class EventQueue(object):
     def __init__(self):
-        self.paused = 0
+        self.is_paused = 0
         self.events = []
         self.iter_events = []
 
     def __next__(self):
-        if self.paused or not len(self.iter_events):
+        if self.is_paused or not len(self.iter_events):
             raise StopIteration()
 
         event = self.iter_events.pop(0)
@@ -32,10 +32,10 @@ class EventQueue(object):
         return len(self.iter_events) > 0
 
     def pause(self):
-        self.paused += 1
+        self.is_paused += 1
 
     def resume(self):
-        self.pause -= 1
+        self.is_paused -= 1
 
 
 class Event(object):

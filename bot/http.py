@@ -27,6 +27,14 @@ class HttpResponse(object):
     def __repr__(self):
         return '<HttpResponse {} ({})>'.format(self.status_code, self.headers)
 
+    @property
+    def json(self):
+        return json.loads(self.content)
+
+    @property
+    def xml(self):
+        return ElementTree.fromstring(self.content)
+
 
 class HttpSock(znc.Socket):
     HTTP_STATES = {
@@ -37,7 +45,7 @@ class HttpSock(znc.Socket):
         'BODY': 4,
     }
 
-    def Init(self, url, qs=None, data=None, method=None, headers={}, timeout=10, callback=None, args=[], kwargs={}):
+    def Init(self, event, func, url, qs=None, data=None, method=None, headers={}, timeout=5):
         self.state = HTTP_STATES['AWAITING_CONNECTION']
 
         o = urlparse(url)
@@ -45,10 +53,11 @@ class HttpSock(znc.Socket):
         self.path = o.path
         self.qs = qs
         self.data = data
+        self.event = event
+        self.func = func
 
-        self.callback = callback
-        self.args = args
-        self.kwargs = kwargs
+        if self.event and self.event.queue:
+            self.event.queue.pause()
 
         if method:
             self.method = method.upper()
@@ -128,19 +137,18 @@ class HttpSock(znc.Socket):
 
         self.state = HTTP_STATES['DISCONNECTED']
 
-        if self.callback:
-            self.OnCallback()
+        handler = None
 
-    def OnCallback(self):
-        self.callback(self, self.response, *self.args, **self.kwargs)
+        if self.response.status_code in self.func.http_handlers:
+            handler = self.func.http_handlers[self.response.status_code]
+        elif None in self.func.http_handlers:
+            handler = self.func.http_handlers[None]
 
+        if handler:
+            self.event.write(handler(self.GetModule(), self.event, self.response))
 
-class JsonHttpSock(HttpSock):
-    def OnCallback(self):
-        if self.response.status_code == 200:
-            self.callback(self, self.response, json.loads(self.response.content), *self.args, **self.kwargs)
+        if self.event.queue:
+            self.event.queue.resume()
 
-class XmlHttpSock(HttpSock):
-    def OnCallback(self):
-        if self.response.status_code == 200:
-            self.callback(self, self.response, ElementTree.fromstring(self.response.content), *self.args, **self.kwargs)
+            self.GetModule().find_bot().handle_event(self.event.queue)
+
