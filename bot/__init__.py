@@ -2,7 +2,7 @@ import re
 import inspect
 import znc
 
-from bot.decorators import is_command, command, regex
+from bot.decorators import *
 from bot.module import Module, Event
 
 class Ping(object):
@@ -60,10 +60,12 @@ class bot(znc.Module):
                 return command
 
     def handle_command(self, nick, channel=None, line=None):
-        event = Event(module=self, nick=str(nick), line=str(line))
+        event = Event(module=self, nick=nick, line=str(line))
         if channel:
             event['channel'] = str(channel)
             event['_channel'] = channel
+
+        event['network'] = str(self.GetNetwork())
 
         line = line.replace('\|', "\0p\0")  # Escaped pipes
         result = None
@@ -129,7 +131,7 @@ class bot(znc.Module):
     def which(self, event, name):
         for plugin in self.plugins:
             for command in inspect.getmembers(plugin, is_command):
-                if command.name == name:
+                if command[1].name == name:
                     return plugin.__class__.__name__
 
         return '{}: Command not found'.format(name)
@@ -159,6 +161,8 @@ class bot(znc.Module):
 
     def OnChanMsg(self, nick, channel, message):
         message = str(message)
+
+        nick = channel.FindNick(str(nick))
 
         if message.startswith(self.nv['control_character']):
             line = message[len(self.nv['control_character']):]

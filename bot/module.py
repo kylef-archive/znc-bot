@@ -8,7 +8,7 @@ class Module(znc.Module):
         module = None
 
         if self.GetNetwork():
-            module = self.GetNetwork().GetModules.FindModule('bot')
+            module = self.GetNetwork().GetModules().FindModule('bot')
 
         if not module:
             module = self.GetUser().GetModules().FindModule('bot')
@@ -35,5 +35,8 @@ class Event(dict):
         for line in message:
             self['module'].PutIRC('PRIVMSG {} :{}'.format(recipient, line))
 
+    @property
+    def is_private(self):
+        return 'channel' not in self
 
 
