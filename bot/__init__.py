@@ -3,7 +3,8 @@ import inspect
 import znc
 
 from bot.decorators import *
-from bot.module import Module, Event
+from bot.module import Module
+from bot.events import EventQueue, Event, CommandEvent
 
 class Ping(object):
     @command()
@@ -59,23 +60,39 @@ class bot(znc.Module):
             if command.name == name:
                 return command
 
-    def handle_command(self, nick, channel=None, line=None):
-        event = Event(module=self, nick=nick, line=str(line))
-        if channel:
-            event['channel'] = str(channel)
-            event['_channel'] = channel
+    def handle_event(self, event):
+        if isinstance(event, EventQueue):
+            for e in event:
+                self.handle_event(e)
+        elif isinstance(event, CommandEvent):
+            c = self.find_command(event['name'])
+            if not c:
+                event.reply('{}: Command not found.'.format(event['name']))
+                return
 
-        event['network'] = str(self.GetNetwork())
+            try:
+                event.write(c(event, event['args']))
+            except Exception as e:
+                event.reply('{}: Failed to execute'.format(event['name']))
+
+
+    def handle_command(self, nick, channel=None, line=None):
+        queue = EventQueue()
+        base = CommandEvent(queue, module=self, nick=nick, line=str(line))
+        if channel:
+            base['channel'] = str(channel)
+            base['_channel'] = channel
+
+        base['network'] = str(self.GetNetwork())
 
         line = line.replace('\|', "\0p\0")  # Escaped pipes
-        result = None
 
         for args in line.split('|'):
             args = args.strip()
             args = args.replace("\0p\0", '|')  # Unescaped pipes
 
             if not re.match('^[A-z0-9]', args):
-                event.reply("Commands must start with a character.")
+                base.reply("Commands must start with a character.")
                 return
 
             try:
@@ -84,24 +101,12 @@ class bot(znc.Module):
                 name = args
                 args = ''
 
-            if result:
-                args += ' ' + result
+            event = base.copy()
             event['args'] = args
+            event['name'] = name
+            queue.append(event)
 
-            c = self.find_command(name)
-
-            if not c:
-                event.reply('{}: Command not found'.format(name))
-                return
-
-            try:
-                result = c(event, args)
-            except Exception as e:
-                #raise e
-                event.reply('{}: Failed to execute'.format(name))
-                return
-
-        event.reply(result)
+        self.handle_event(queue)
 
     # Commands
 

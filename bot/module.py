@@ -18,25 +18,3 @@ class Module(znc.Module):
 
         return None
 
-
-class Event(dict):
-    def reply(self, message):
-        if not message:
-            return
-
-        if 'channel' in self:
-            recipient = self['channel']
-        else:
-            recipient = self['nick']
-
-        if isinstance(message, str):
-            message = message.split('\n')
-
-        for line in message:
-            self['module'].PutIRC('PRIVMSG {} :{}'.format(recipient, line))
-
-    @property
-    def is_private(self):
-        return 'channel' not in self
-
-
