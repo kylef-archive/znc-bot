@@ -49,6 +49,7 @@ class HttpSock(znc.Socket):
         self.state = HTTP_STATES['AWAITING_CONNECTION']
 
         o = urlparse(url)
+        self.response = None
         self.headers = headers
         self.path = o.path
         self.qs = qs
@@ -139,6 +140,10 @@ class HttpSock(znc.Socket):
 
         handler = None
 
+        if not self.response:
+            self.event.error('HTTP error')
+            return
+
         if self.response.status_code in self.func.http_handlers:
             handler = self.func.http_handlers[self.response.status_code]
         elif None in self.func.http_handlers:
@@ -150,5 +155,9 @@ class HttpSock(znc.Socket):
         if self.event.queue:
             self.event.queue.resume()
 
-            self.GetModule().find_bot().handle_event(self.event.queue)
+            bot = self.GetModule().find_bot()
+            if not bot:
+                bot = self.event['bot']
+
+            bot.handle_event(self.event.queue)
 

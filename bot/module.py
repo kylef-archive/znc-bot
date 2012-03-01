@@ -1,5 +1,6 @@
 import znc
 from bot.http import *
+from bot.events import Event
 
 class Module(znc.Module):
     module_types = [znc.CModInfo.NetworkModule, znc.CModInfo.UserModule]
@@ -17,4 +18,7 @@ class Module(znc.Module):
             return znc.AsPyModule(module).GetNewPyObj()
 
         return None
+
+    def event(self, **kwargs):
+        return Event(network=str(self.GetNetwork()), module=self, **kwargs)
 

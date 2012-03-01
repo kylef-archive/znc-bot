@@ -86,7 +86,12 @@ class Event(object):
             message = message.split('\n')
 
         for line in message:
-            self['module'].PutIRC('PRIVMSG {} :{}'.format(recipient, line))
+            self.network.PutIRC('PRIVMSG {} :{}'.format(recipient, line))
+
+    @property
+    def network(self):
+        if 'network' in self:
+            return self['module'].GetUser().FindNetwork(self['network'])
 
     @property
     def is_private(self):
