@@ -48,7 +48,7 @@ class bot(znc.Module):
     module_types = [znc.CModInfo.NetworkModule, znc.CModInfo.UserModule]
 
     def __init__(self):
-        self.extra_plugins = [self, Ping(), Utils()]
+        self.extra_plugins = [Ping(), Utils()]
 
     @property
     def plugins(self):
