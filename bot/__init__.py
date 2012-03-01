@@ -89,13 +89,13 @@ class bot(znc.Module):
         elif isinstance(event, CommandEvent):
             c = self.find_command(event['name'])
             if not c:
-                event.reply('{}: Command not found.'.format(event['name']))
+                event.error('{}: Command not found.'.format(event['name']))
                 return
 
             try:
                 event.write(c(event, event['args']))
             except Exception as e:
-                event.reply('{}: Failed to execute'.format(event['name']))
+                event.error('{}: Failed to execute'.format(event['name']))
 
 
     def handle_command(self, nick, channel=None, line=None):

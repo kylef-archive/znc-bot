@@ -11,7 +11,7 @@ def regex(pattern=r'^(?P<line>.+)?$'):
             match = r.search(line)
 
             if not match:
-                return 'Invalid Arguments'
+                event.error('{}: Invalid arguments'.format(event['name']))
 
             kwargs = match.groupdict()
             if kwargs:
@@ -23,7 +23,7 @@ def regex(pattern=r'^(?P<line>.+)?$'):
         return new_func
     return decorator
 
-def command(**kwargs):
+def command(func=None, **kwargs):
     def decorator(func):
         func.is_command = True
 
@@ -34,6 +34,10 @@ def command(**kwargs):
             func.name = func.__name__
 
         return func
+
+    if func is not None:
+        return decorator(func)
+
     return decorator
 
 def is_command(func):

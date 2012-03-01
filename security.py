@@ -19,15 +19,15 @@ class security(Module):
         except ValueError:
             return '{}: Unknown algorithm'.format(algorithm)
 
-    @command(usage='data', example='Encode the input with base64')
+    @command(description='Encode the input with base64')
     def base64(self, event, line):
         return str(base64.encodestring(bytes(line, 'utf8')), 'utf8')
 
-    @command(usage='data', example='Decode the input with base64')
+    @command(description='Decode the input with base64')
     def decode64(self, event, line):
         return str(base64.decodestring(bytes(line, 'utf8')), 'utf8')
 
-    @command(usage='data')
+    @command
     def rot13(self, event, line):
         rot13_trans = str.maketrans('ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz', 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm')
         return line.translate(rot13_trans)

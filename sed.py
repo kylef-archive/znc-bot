@@ -15,7 +15,7 @@ class sed(Module):
         else:
             self.previous_lines[str(nick)] = str(message)
 
-    @command()
+    @command
     def sed(self, event, line):
         if event.stdin:
             data = event.stdin

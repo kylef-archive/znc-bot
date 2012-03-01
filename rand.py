@@ -14,6 +14,6 @@ class rand(Module):
     def dice(self, event, line):
         return self.choice(event, ','.join([str(x) for x in range(1,7)]))
 
-    @command( description='Make a random choice', usage='<comma seperated list>', example='sausage, bacon')
+    @command(description='Make a random choice', usage='<comma seperated list>', example='sausage, bacon')
     def choice(self, event, line):
         return random.choice(line.split(',')).strip()
