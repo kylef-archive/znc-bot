@@ -1,6 +1,23 @@
 import random
 from bot.api import *
 
+EIGHTBALL_CHOICES = [
+    "You may rely on it",
+    "It is certain",
+    "As I see it, yes",
+    "Cannot predict now",
+    "Yes definitely",
+    "Most likely",
+    "Concentrate and ask again",
+    "Outlook good",
+    "Yes",
+    "Yes -- Definitely",
+    "Outlook not so good",
+    "Without a doubt",
+    "Reply hazy, try again",
+    "Better not tell you now",
+]
+
 class rand(Module):
     @command(description='Yes or no?')
     def yesno(self, event, line):
@@ -17,3 +34,7 @@ class rand(Module):
     @command(description='Make a random choice', usage='<comma seperated list>', example='sausage, bacon')
     def choice(self, event, line):
         return random.choice(line.split(',')).strip()
+
+    @command
+    def eightball(self, event, line):
+        return random.choice(EIGHTBALL_CHOICES)
