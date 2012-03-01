@@ -7,29 +7,22 @@ from bot.module import Module
 from bot.events import EventQueue, Event, CommandEvent
 
 class Ping(object):
-    @command()
+    @command
     def ping(self, event, line):
         return 'pong'
 
 
 class Utils(object):
-    @command()
+    @command
     def echo(self, event, line):
         if event.stdin:
             return event.stdin
         return line
 
-    @command()
-    def count(self, event, line):
-        seperator = None
-
-        if event.stdin:
-            seperator = line
-            data = event.stdin
-        else:
-            data = line
-
+    def seperate(self, data, seperator=None):
         if not seperator:
+            if '\n' in data:
+                seperator = '\n'
             if ',' in data:
                 seperator = ','
             elif ' ' in data:
@@ -40,8 +33,42 @@ class Utils(object):
         if seperator:
             data = data.split(seperator)
 
+        return data
+
+    @command
+    def count(self, event, line):
+        if event.stdin:
+            data = self.seperate(event.stdin, line)
+        else:
+            data = self.seperate(line)
+
         return str(len(data))
 
+    @command(description='search input for data')
+    def grep(self, event, pattern):
+        if event.stdin:
+            data = self.seperate(event.stdin)
+        else:
+            pattern, data = pattern.split(' ', 1)
+            data = self.seperate(data)
+
+        pattern = re.compile(pattern)
+        result = [x.strip() for x in data if pattern.search(x)]
+
+        return ', '.join(result)
+
+    @command(name='not', description='opposite to grep')
+    def not_grep(self, event, pattern):
+        if event.stdin:
+            data = self.seperate(event.stdin)
+        else:
+            pattern, data = pattern.split(' ', 1)
+            data = self.seperate(data)
+
+        pattern = re.compile(pattern)
+        result = [x.strip() for x in data if not pattern.search(x)]
+
+        return ', '.join(result)
 
 class bot(znc.Module):
     description = 'Python Bot'
