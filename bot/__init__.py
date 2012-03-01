@@ -15,15 +15,37 @@ class Ping(object):
 class Utils(object):
     @command()
     def echo(self, event, line):
+        if event.stdin:
+            return event.stdin
         return line
 
     @command()
     def count(self, event, line):
-        return str(len(line.split(',')))
+        seperator = None
+
+        if event.stdin:
+            seperator = line
+            data = event.stdin
+        else:
+            data = line
+
+        if not seperator:
+            if ',' in data:
+                seperator = ','
+            elif ' ' in data:
+                seperator = ' '
+            else:
+                seperator = ''
+
+        if seperator:
+            data = data.split(seperator)
+
+        return str(len(data))
 
 
 class bot(znc.Module):
     description = 'Python Bot'
+    module_types = [znc.CModInfo.NetworkModule, znc.CModInfo.UserModule]
 
     def __init__(self):
         self.extra_plugins = [self, Ping(), Utils()]
@@ -171,7 +193,7 @@ class bot(znc.Module):
 
         if message.startswith(self.nv['control_character']):
             line = message[len(self.nv['control_character']):]
-            if line and re.match('^[A-z0-9]', line):
+            if line and re.match('^[A-z]', line):
                 self.handle_command(nick, channel, line)
         else:
             match = re.search(r'^{}(:|,) (.+)$'.format(self.GetNetwork().GetCurNick()), message)
