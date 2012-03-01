@@ -13,16 +13,18 @@ Loading
 
 Loading znc-bot
 
-.. code-block
+.. code-block::
 
     /msg *status loadmod bot
 
+
 Once the core bot has been loaded you can load any included plugins.
 
-.. code-block
+.. code-block::
 
     /msg *status loadmod security
     /msg *status loadmod rand
+
 
 Bot API
 -------
@@ -35,6 +37,7 @@ Bot API
         @command
         def hi(self, event, args):
             return "Hello there!"
+
 
 Asyncronous HTTP
 ~~~~~~~~~~~~~~~~
@@ -53,4 +56,5 @@ Asyncronous HTTP
         def handle_trending(self, event, response):
             for movie in movies.json:
                 event.write('{title} ({year}) - {overview}'.format(**movie)) 
+
 
