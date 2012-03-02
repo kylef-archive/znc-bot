@@ -13,14 +13,9 @@ Loading
 
 Loading znc-bot
 
-.. code-block::
-
     /msg *status loadmod bot
 
-
 Once the core bot has been loaded you can load any included plugins.
-
-.. code-block::
 
     /msg *status loadmod security
     /msg *status loadmod rand
@@ -29,8 +24,7 @@ Once the core bot has been loaded you can load any included plugins.
 Bot API
 -------
 
-.. code-block:: python
-
+    :::python
     from bot.api import *
 
     class helloworld(Module):
@@ -39,11 +33,9 @@ Bot API
             return "Hello there!"
 
 
-Asyncronous HTTP
-~~~~~~~~~~~~~~~~
+### Asyncronous HTTP
 
-.. code-block:: python
-
+    :::python
     from bot.api import *
 
     class trakt(Module):
