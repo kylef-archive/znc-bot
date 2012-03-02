@@ -24,29 +24,29 @@ Once the core bot has been loaded you can load any included plugins.
 Bot API
 -------
 
-    :::python
-    from bot.api import *
+```python3
+from bot.api import *
 
-    class helloworld(Module):
-        @command
-        def hi(self, event, args):
-            return "Hello there!"
-
+class helloworld(Module):
+    @command
+    def hi(self, event, args):
+        return "Hello there!"
+```
 
 ### Asyncronous HTTP
 
-    :::python
-    from bot.api import *
+```python3
+from bot.api import *
 
-    class trakt(Module):
-        @command
-        @http
-        def trending(self, event, string):
-            event.http('http://api.trakt.tv/movies/trending.json/my-api-key')
+class trakt(Module):
+    @command
+    @http
+    def trending(self, event, string):
+        event.http('http://api.trakt.tv/movies/trending.json/my-api-key')
 
-        @trending.http(200)
-        def handle_trending(self, event, response):
-            for movie in movies.json:
-                event.write('{title} ({year}) - {overview}'.format(**movie)) 
-
+    @trending.http(200)
+    def handle_trending(self, event, response):
+        for movie in movies.json:
+            event.write('{title} ({year}) - {overview}'.format(**movie)) 
+```
 
