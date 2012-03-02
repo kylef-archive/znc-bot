@@ -33,6 +33,9 @@ def command(func=None, **kwargs):
         if not getattr(func, 'name', False):
             func.name = func.__name__
 
+        if not getattr(func, 'description', False) and func.__doc__:
+            func.description = func.__doc__
+
         return func
 
     if func is not None:
