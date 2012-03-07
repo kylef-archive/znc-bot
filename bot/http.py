@@ -45,17 +45,19 @@ class HttpSock(znc.Socket):
         'BODY': 4,
     }
 
-    def Init(self, event, func, url, qs=None, data=None, method=None, headers={}, timeout=5):
+    def Init(self, event, func, url, qs=None, data=None, method=None, headers=None, timeout=5):
         self.state = HTTP_STATES['AWAITING_CONNECTION']
 
         o = urlparse(url)
         self.response = None
-        self.headers = headers
+        self.headers = headers or {}
         self.path = o.path
         self.qs = qs
         self.data = data
         self.event = event
         self.func = func
+
+        self.SetMaxBufferThreshold(80000)
 
         if self.event and self.event.queue:
             self.event.queue.pause()
@@ -68,10 +70,10 @@ class HttpSock(znc.Socket):
             else:
                 self.method = 'GET'
 
-        if 'Host' not in headers:
+        if 'Host' not in self.headers:
             self.headers['Host'] = o.hostname
 
-        if 'User-Agent' not in headers:
+        if 'User-Agent' not in self.headers:
             self.headers['User-Agent'] = 'Mozilla/5.0 ({})'.format(znc.CZNC.GetTag())
 
         if o.query and not self.qs: # Use ?bla=foo in url if its provided
@@ -131,6 +133,17 @@ class HttpSock(znc.Socket):
         elif self.state == HTTP_STATES['BODY']:
             self.response.content += line
 
+    def OnTimeout(self):
+        if 'timeout' in self.func.http_handlers:
+            handler = self.func.http_handlers['timeout']
+        elif None in self.func.http_handlers:
+            handler = self.func.http_handlers[None]
+        else:
+            self.event.error('HTTP: Request timed out')
+            return
+
+        self.event.write(handler(self.GetModule(), self.event, self.response))
+
     def OnDisconnected(self):
         buf = self.GetInternalReadBuffer()
         if buf.s:
@@ -148,6 +161,12 @@ class HttpSock(znc.Socket):
             handler = self.func.http_handlers[self.response.status_code]
         elif None in self.func.http_handlers:
             handler = self.func.http_handlers[None]
+        elif self.response.status_code == 404:
+            self.event.error('Page not found (404)')
+            return
+        else:
+            self.event.error('HTTP: Unhandled response ({})'.format(self.response.status_code))
+            return
 
         if handler:
             self.event.write(handler(self.GetModule(), self.event, self.response))
