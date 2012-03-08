@@ -67,11 +67,12 @@ class Event(object):
         else:
             self.reply(data)
 
-    def error(self, data):
+    def error(self, data=None):
         if self.queue:
             self.queue.clear()
 
-        self.reply('error: ' + data)
+        if data:
+            self.reply('\x0304' + data)
 
     def reply(self, message):
         if not message:
