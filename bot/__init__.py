@@ -108,6 +108,9 @@ class bot(znc.Module):
         for command in self.commands:
             if command.name == name:
                 return command
+            elif hasattr(command, 'alias'):
+                if name == command.alias:
+                    return command
 
     def handle_event(self, event):
         if isinstance(event, EventQueue):

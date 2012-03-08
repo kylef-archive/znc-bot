@@ -35,6 +35,6 @@ class rand(Module):
     def choice(self, event, line):
         return random.choice(line.split(',')).strip()
 
-    @command
+    @command(alias='8ball')
     def eightball(self, event, line):
         return random.choice(EIGHTBALL_CHOICES)
