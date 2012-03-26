@@ -31,7 +31,7 @@ class Utils(object):
                 seperator = ''
 
         if seperator:
-            data = data.split(seperator)
+            data = [x.strip() for x in data.split(seperator)]
 
         return data
 
@@ -69,6 +69,16 @@ class Utils(object):
         result = [x.strip() for x in data if not pattern.search(x)]
 
         return ', '.join(result)
+
+    @command
+    def sort(self, event, line):
+        if event.stdin:
+            data = self.seperate(event.stdin, line)
+        else:
+            data = self.seperate(line)
+
+        data.sort()
+        return ', '.join(data)
 
 class bot(znc.Module):
     description = 'Python Bot'
@@ -182,7 +192,10 @@ class bot(znc.Module):
                 return "\n".join(page)
 
             return '{}: No help availible for this command'.format(command.name)
-        return ', '.join([command.name for command in self.commands])
+
+        commands = [command.name for command in self.commands]
+        commands.sort()
+        return ', '.join(commands)
 
     @command()
     def which(self, event, name):
