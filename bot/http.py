@@ -162,7 +162,8 @@ class HttpSock(znc.Socket):
         elif None in self.func.http_handlers:
             handler = self.func.http_handlers[None]
         elif self.response.status_code == 404:
-            self.event.error('Page not found (404)')
+            if not ('silent' in event and event['silent']):
+                self.event.error('Page not found (404)')
             return
         else:
             self.event.error('HTTP: Unhandled response ({})'.format(self.response.status_code))
