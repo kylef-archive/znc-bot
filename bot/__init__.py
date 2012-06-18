@@ -1,5 +1,6 @@
 import re
 import inspect
+
 import znc
 
 from bot.decorators import *
@@ -129,7 +130,8 @@ class bot(znc.Module):
         elif isinstance(event, CommandEvent):
             c = self.find_command(event['name'])
             if not c:
-                event.error('{}: Command not found.'.format(event['name']))
+                if not ('silent' in event and event['silent']):
+                    event.error('{}: Command not found.'.format(event['name']))
                 return
 
             try:
@@ -138,7 +140,7 @@ class bot(znc.Module):
                 event.error('{}: Failed to execute'.format(event['name']))
 
 
-    def handle_command(self, nick, channel=None, line=None):
+    def handle_command(self, nick, channel=None, line=None, silent=True):
         queue = EventQueue()
         base = CommandEvent(queue, module=self, nick=nick, line=str(line))
         if channel:
@@ -154,7 +156,8 @@ class bot(znc.Module):
             args = args.replace("\0p\0", '|')  # Unescaped pipes
 
             if not re.match('^[A-Za-z\d]', args):
-                base.reply("Commands must start with a character.")
+                if not silent:
+                    base.reply("Commands must start with a character.")
                 return
 
             try:
@@ -166,7 +169,9 @@ class bot(znc.Module):
             event = base.copy()
             event['args'] = args
             event['name'] = name
+            event['silent'] = silent
             queue.append(event)
+            silent = False
 
         self.handle_event(queue)
 
@@ -237,7 +242,7 @@ class bot(znc.Module):
         if message.startswith(self.nv['control_character']):
             line = message[len(self.nv['control_character']):]
             if line and re.match('^[A-Za-z\d]', line):
-                self.handle_command(nick, channel, line)
+                self.handle_command(nick, channel, line, silent=True)
         else:
             match = re.search(r'^{}(:|,) (.+)$'.format(self.GetNetwork().GetCurNick()), message)
             if match:
