@@ -140,7 +140,7 @@ class bot(znc.Module):
                 event.error('{}: Failed to execute'.format(event['name']))
 
 
-    def handle_command(self, nick, channel=None, line=None, silent=True):
+    def handle_command(self, nick, channel=None, line=None, silent=False):
         queue = EventQueue()
         base = CommandEvent(queue, module=self, nick=nick, line=str(line))
         if channel:
