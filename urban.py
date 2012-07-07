@@ -4,7 +4,7 @@ class urban(Module):
     @command(name='urban', description='Search urban dictionary')
     @http
     def search(self, event, query):
-        event.http('http://www.urbandictionary.com/iphone/search/define', qs={'term':query})
+        event.http('http://api.urbandictionary.com/v0/define', qs={'term':query})
 
     @search.http(200)
     def handle_search(self, event, response):
