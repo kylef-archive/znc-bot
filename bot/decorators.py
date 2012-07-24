@@ -46,6 +46,9 @@ def command(func=None, **kwargs):
 def is_command(func):
     return getattr(func, 'is_command', False)
 
+def is_interval(func):
+    return getattr(func,'is_interval', False)
+
 def http(func):
     @wraps(func)
     def new_func(plugin, event, *args, **kwargs):
@@ -68,6 +71,17 @@ def http(func):
 
     return new_func
 
+def interval(time, **kwargs):
+    """
+    Run command at regular intervals set by 'time'
+    """
+    def decorator(func):
+        func.is_interval = True
+        func.interval = time
+        func.eventargs = kwargs
+        return func
+    
+    return decorator
 
 # IRC
 def private(func):
